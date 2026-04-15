@@ -8,7 +8,8 @@ export const chatSocket = (io) => {
 
     socket.on("userOnline", (userId) => {
       onlineUsers.set(userId, socket.id);
-      console.log("Online Users:", onlineUsers);
+
+      io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
     });
 
     socket.on("joinChat", ({ userId, receiverId }) => {
@@ -16,22 +17,34 @@ export const chatSocket = (io) => {
       socket.join(roomId);
       console.log(`Joined Room: ${roomId}`);
     });
-    
+
     socket.on("sendMessage", async ({ sender, receiver, text }) => {
       try {
-        const roomId = [sender, receiver].sort().join("_");
-
         const message = await Message.create({
           sender,
           receiver,
           text,
         });
 
-        io.to(roomId).emit("receiveMessage", message);
+        const receiverSocketId = onlineUsers.get(receiver);
+
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("receiveMessage", message);
+        }
+
+        socket.emit("receiveMessage", message);
       } catch (error) {
         console.log("Message Error:", error);
       }
     });
+
+    socket.on("typing", ({ sender, receiver }) => {
+       const receiverSocketId = onlineUsers.get(receiver);
+
+    if (receiverSocketId) { 
+      io.to(receiverSocketId).emit("typing", { sender });
+  }
+});
 
     socket.on("markSeen", async ({ messageId }) => {
       try {
@@ -52,7 +65,7 @@ export const chatSocket = (io) => {
         }
       }
 
-      console.log("Online Users After Disconnect:", onlineUsers);
+      io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
     });
   });
 };
