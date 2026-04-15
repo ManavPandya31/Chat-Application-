@@ -88,4 +88,12 @@ const loginUser = asyncHandler(async(req,res) => {
 
 });
 
-export { registeruser , loginUser }
+const getAllUsers = asyncHandler(async(req,res) => {
+
+    const users = await User.find().select("-password -refreshToken");
+
+    return res.status(200)
+              .json(new apiResponse(200,users,"All Users fetch Sucessfully"));
+})
+
+export { registeruser , loginUser , getAllUsers }
