@@ -5,6 +5,9 @@ import app from "./app.js";
 import db from "./DB/db.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { chatSocket } from "./Sockets/chat.socket.js";
+
+chatSocket(io);
 
 //Socket Server Setup...
 //http Server..
@@ -23,7 +26,8 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect",()=>{
         console.log("User Disconnected..",socket.id);
-    })
+    });
+    
 });
 
 db()
