@@ -7,8 +7,6 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { chatSocket } from "./Sockets/chat.socket.js";
 
-chatSocket(io);
-
 //Socket Server Setup...
 //http Server..
 const server = createServer(app);
@@ -19,6 +17,8 @@ const io = new Server(server,{
         origin : "*",
     },
 });
+
+chatSocket(io);
 
 //Socket logic...
 io.on("connection", (socket) => {
