@@ -3,14 +3,16 @@ import { Message } from "../Models/Message.model.js";
 const onlineUsers = new Map();
 
 export const chatSocket = (io) => {
+  //Connection Event
   io.on("connection", (socket) => {
     console.log("User Connected:", socket.id);
 
+    //For Finding Online Users Store userId with socketId in Map...
     socket.on("userOnline", (userId) => {
       onlineUsers.set(userId, socket.id);
 
       io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
-    });
+    }); 
 
     socket.on("joinChat", ({ userId, receiverId }) => {
       const roomId = [userId, receiverId].sort().join("_");
