@@ -5,6 +5,7 @@ import app from "./app.js";
 import db from "./DB/db.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { setSocketInstance } from "./services/socket.service.js";
 import { chatSocket } from "./Sockets/chat.socket.js";
 
 const server = createServer(app);
@@ -15,10 +16,12 @@ const io = new Server(server,    {
   },
 });
 
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
+setSocketInstance(io);
+
+// app.use((req, res, next) => {
+//   req.io = io;
+//   next();
+// });
 
 chatSocket(io);
 
