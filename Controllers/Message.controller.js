@@ -5,6 +5,7 @@ import { emitMessagesSeen } from "../services/socket.service.js";
 import mongoose from "mongoose";
 
 const getMessages = asyncHandler(async (req, res) => {
+
   const { senderId, receiverId } = req.params;
 
   const messages = await Message.find({
@@ -20,6 +21,7 @@ const getMessages = asyncHandler(async (req, res) => {
 });
 
 const getUnreadCounts = asyncHandler(async (req, res) => {
+
   const { userId } = req.params;
 
   const counts = await Message.aggregate([

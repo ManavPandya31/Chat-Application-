@@ -19,7 +19,9 @@ export const chatSocket = (io) => {
 
       const decoded = JWT.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-      const user = await User.findById(decoded._id).select("-password -refreshToken",);
+      const user = await User.findById(decoded._id).select(
+        "-password -refreshToken",
+      );
 
       if (!user) {
         return next(new Error("Unauthorized: Invalid user"));
@@ -27,12 +29,11 @@ export const chatSocket = (io) => {
 
       socket.user = user;
       next();
-
     } catch (error) {
       return next(new Error("Unauthorized: Invalid token"));
     }
   });
-  
+
   //Connection Establishing...
   io.on("connection", (socket) => {
     console.log("User Connected:", socket.id);
@@ -48,7 +49,7 @@ export const chatSocket = (io) => {
     io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
 
     //Join In The Persnol Char Room...
-    socket.on("joinChat", ({ userId, receiverId }) => {
+    socket.on("joinChat", ({ receiverId }) => {
       const currentUserId = socket.user._id.toString();
       const roomId = [currentUserId, receiverId.toString()].sort().join("_");
       socket.join(roomId); //roomId = private chat
@@ -56,10 +57,9 @@ export const chatSocket = (io) => {
     });
 
     //From Here Start Conversition...
-   socket.on("sendMessage", async ({ receiver, text }) => {
+    socket.on("sendMessage", async ({ receiver, text }) => {
       try {
         const sender = socket.user._id;
-
         if (!receiver || !text) return;
 
         const message = await Message.create({
@@ -70,15 +70,17 @@ export const chatSocket = (io) => {
 
         const roomId = [sender.toString(), receiver.toString()].sort().join("_");
 
-        io.to(roomId).emit("receiveMessage", message);
+        io.to(roomId).emit("receiveMessage", {
+          ...message._doc,
+          sender: sender.toString(), // Explicitly send as string
+        });
 
       } catch (error) {
         console.log("Message Error:", error);
-        socket.emit("errorMessage", "Failed to send message");
       }
     });
 
-    socket.on("typing", ({ sender, receiver }) => {
+    socket.on("typing", ({ receiver }) => {
       const actualSender = socket.user._id;
       const roomId = [actualSender.toString(), receiver.toString()].sort().join("_");
       socket.to(roomId).emit("typing", { sender: actualSender });
@@ -89,7 +91,6 @@ export const chatSocket = (io) => {
         await Message.findByIdAndUpdate(messageId, { seen: true });
 
         io.to(senderId.toString()).emit("messageSeen", { messageId });
-
       } catch (error) {
         console.log("Seen Error:", error);
       }
