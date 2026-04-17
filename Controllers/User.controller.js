@@ -2,6 +2,7 @@ import { asyncHandler } from "../Utils/asyncHandler.js";
 import { apiError } from "../Utils/apiError.js";
 import { apiResponse } from "../Utils/apiResponse.js";
 import { User } from "../Models/User.model.js";
+import { uploadOnCloudinary } from "../Utils/cloudinary.js";
 
              const options = {
                 httpOnly : true,
@@ -28,7 +29,7 @@ const accessAndRefreshTokens = async(userId)=>{
 
 const registeruser = asyncHandler(async(req,res) => {
 
-    const { Name , Mobile , Gender , Email , password } = req.body;
+    const { Name , Mobile , Gender , Email , password  , bio} = req.body;
 
     if(!Name ||  !Mobile || !Gender || !Email || !password) {
         throw new apiError(400,"Required Field Is Missing...");
@@ -40,12 +41,26 @@ const registeruser = asyncHandler(async(req,res) => {
         throw new apiError(400,"User Is Already Existed With This Email...");
     }
 
+    let profilePicUrl = "";
+
+    if (req.file) {
+        const uploadImage = await uploadOnCloudinary(req.file.buffer);
+
+        if (!uploadImage) {
+            throw new apiError(400, "Image upload failed");
+        }
+
+        profilePicUrl = uploadImage.secure_url;
+    }
+
     const user = await User.create({
         Name,
         Mobile,
         Gender,
         Email,
-        password
+        password,
+        bio,
+        profilePicture: profilePicUrl,
     });
   
     return res.status(200)

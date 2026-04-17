@@ -6,6 +6,9 @@ import { User } from "../Models/User.model.js";
 
 const verifyJwtToken = asyncHandler(async(req,res,next)=>{
     
+    console.log("AUTH HEADER:", req.headers.authorization);
+    // console.log("TOKEN:", token);
+
     try {   
 
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
@@ -15,6 +18,7 @@ const verifyJwtToken = asyncHandler(async(req,res,next)=>{
         }
 
         const decodeData = JWT.verify(token,process.env.ACCESS_TOKEN_SECRET);
+        console.log("DECODED:", decodeData);
         
         const user = await User.findById(decodeData?._id).select("-password -refreshToken");
 
@@ -26,6 +30,8 @@ const verifyJwtToken = asyncHandler(async(req,res,next)=>{
         next();
         
     } catch (error) {
+        console.log("JWT ERROR:", error.message);
+
         return res.status(401)  
                   .json(new apiResponse(401,"Invalid Or Expired Token"));
     }

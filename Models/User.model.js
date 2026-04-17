@@ -30,6 +30,15 @@ const userSchema = new Schema({
         required : true,
     },
 
+    bio : {
+        type : String,
+    },
+
+    profilePicture : {
+        type: String, 
+        default: ""
+    },
+
     refreshToken : {
         type : String,
     }
@@ -51,7 +60,7 @@ userSchema.methods.isPasswordCorrect = async function(password) {
 userSchema.methods.generateAccessToken = async function(){
     return jwt.sign({
         _id : this._id,
-        email : this.email, 
+        Email : this.Email, 
     },
         process.env.ACCESS_TOKEN_SECRET,
         {
