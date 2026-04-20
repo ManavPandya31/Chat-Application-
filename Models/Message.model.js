@@ -8,10 +8,10 @@ const messageSchema = new Schema({
         required : true,
     },
 
-    receiver : {
-        type : Schema.Types.ObjectId,
-        ref : "User",
-        required : true,
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
     },
 
     text : {
