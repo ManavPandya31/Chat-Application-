@@ -96,6 +96,48 @@ export const chatSocket = (io) => {
       }
     });
 
+    //Start Here For Group Chating...
+    //For Group Chatting Need The GroupId
+
+    socket.on("joinGroup", ({ groupId }) => {
+        socket.join(groupId);
+        console.log("Joined Group:", groupId);
+      });
+
+      socket.on("sendGroupMessage", async ({ groupId, text }) => {
+        try {
+          const sender = socket.user._id;
+
+          if (!groupId || !text) return;
+
+          const message = await Message.create({
+            sender,
+            groupId,
+            text,
+          });
+
+          io.to(groupId).emit("receiveGroupMessage", {
+            ...message._doc,
+            sender: sender.toString(),
+          });
+
+        } catch (error) {
+          console.log("Group Message Error:", error);
+        }
+      });
+
+      socket.on("typingGroup", ({ groupId }) => {
+        const sender = socket.user._id;
+
+        socket.to(groupId).emit("typingGroup", {
+          sender,
+        });
+      });
+
+      socket.on("markGroupSeen", async ({ messageId }) => {
+        await Message.findByIdAndUpdate(messageId, { seen: true });
+      });
+
     //Connection Closing...
     socket.on("disconnect", () => {
       console.log("User Disconnected:", socket.id);

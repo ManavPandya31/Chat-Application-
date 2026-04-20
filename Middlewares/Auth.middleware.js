@@ -6,7 +6,7 @@ import { User } from "../Models/User.model.js";
 
 const verifyJwtToken = asyncHandler(async(req,res,next)=>{
     
-    console.log("AUTH HEADER:", req.headers.authorization);
+    //console.log("AUTH HEADER:", req.headers.authorization);
     // console.log("TOKEN:", token);
 
     try {   
@@ -18,7 +18,7 @@ const verifyJwtToken = asyncHandler(async(req,res,next)=>{
         }
 
         const decodeData = JWT.verify(token,process.env.ACCESS_TOKEN_SECRET);
-        console.log("DECODED:", decodeData);
+        //console.log("DECODED:", decodeData);
         
         const user = await User.findById(decodeData?._id).select("-password -refreshToken");
 
