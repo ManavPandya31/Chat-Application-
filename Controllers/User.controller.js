@@ -103,12 +103,16 @@ const loginUser = asyncHandler(async(req,res) => {
 
 });
 
-const getAllUsers = asyncHandler(async(req,res) => {
+const getAllUsers = asyncHandler(async (req, res) => {
 
-    const users = await User.find().select("-password -refreshToken");
+    const currentUserId = req.user?._id;  
+
+    const users = await User.find({
+        _id: { $ne: currentUserId }
+    }).select("-password -refreshToken");
 
     return res.status(200)
-              .json(new apiResponse(200,users,"All Users fetch Sucessfully"));
-})
+        .json(new apiResponse(200, users, "All Users fetch Successfully"));
+});
 
 export { registeruser , loginUser , getAllUsers }
