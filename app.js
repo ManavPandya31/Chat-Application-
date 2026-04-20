@@ -7,9 +7,18 @@ import userRoute from "./Routers/User.route.js";
 
 const app = express();
 
+// app.use(cors({
+//   origin: "https://chat-application-by-manavpandya.onrender.com",
+//   credentials: true
+// }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://chat-application-by-manavpandya.onrender.com"
+];
+
 app.use(cors({
-  origin: "https://chat-application-by-manavpandya.onrender.com",
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true,
 }));
 app.use(compression());
 app.use(express.json());    
