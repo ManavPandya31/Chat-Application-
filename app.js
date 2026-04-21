@@ -14,7 +14,7 @@ const app = express();
 // }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://chat-app-by-manavpandya31.netlify.app"
+  "https://chat-application-by-manavpandya.netlify.app"
 ];
 
 app.use(cors({
