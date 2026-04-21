@@ -14,7 +14,7 @@ const app = express();
 // }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://chat-application-by-manavpandya.onrender.com"
+  "https://chat-application-frontend-zeta.vercel.app/"
 ];
 
 app.use(cors({
